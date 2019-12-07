@@ -18,8 +18,8 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 
 		Rigidbody m_Rigidbody;
 		Animator m_Animator;
-		bool m_IsGrounded;
-		float m_OrigGroundCheckDistance;
+        bool m_IsGrounded;
+        float m_OrigGroundCheckDistance;
 		const float k_Half = 0.5f;
 		float m_TurnAmount;
 		float m_ForwardAmount;
@@ -29,8 +29,11 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 		CapsuleCollider m_Capsule;
 		bool m_Crouching;
 
+        //変身した瞬間にtrue
+        bool m_IsTransformed;
 
-		void Start()
+
+        void Start()
 		{
 			m_Animator = GetComponent<Animator>();
 			m_Rigidbody = GetComponent<Rigidbody>();
@@ -45,11 +48,10 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 
 		public void Move(Vector3 move, bool crouch, bool jump)
 		{
-
-			// convert the world relative moveInput vector into a local-relative
-			// turn amount and forward amount required to head in the desired
-			// direction.
-			if (move.magnitude > 1f) move.Normalize();
+            // convert the world relative moveInput vector into a local-relative
+            // turn amount and forward amount required to head in the desired
+            // direction.
+            if (move.magnitude > 1f) move.Normalize();
 			move = transform.InverseTransformDirection(move);
 			CheckGroundStatus();
 			move = Vector3.ProjectOnPlane(move, m_GroundNormal);
@@ -186,9 +188,16 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 
 		public void OnAnimatorMove()
 		{
-			// we implement this function to override the default root motion.
-			// this allows us to modify the positional speed before it's applied.
-			if (m_IsGrounded && Time.deltaTime > 0)
+            if (m_IsTransformed)
+            {
+                m_IsTransformed = false;
+                this.ActionTransform();
+
+            }
+
+            // we implement this function to override the default root motion.
+            // this allows us to modify the positional speed before it's applied.
+            if (m_IsGrounded && Time.deltaTime > 0)
 			{
 				Vector3 v = (m_Animator.deltaPosition * m_MoveSpeedMultiplier) / Time.deltaTime;
 
@@ -221,5 +230,21 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 				m_Animator.applyRootMotion = false;
 			}
 		}
-	}
+        public void ActionTransform()
+        {
+            Debug.Log(m_Rigidbody.velocity);
+            m_Rigidbody.angularVelocity = new Vector3();
+
+            Vector3 localForward = Vector3.Scale(transform.forward, new Vector3(1, 0, 1)).normalized;
+            float y = Mathf.Atan2(localForward.x, localForward.z) * Mathf.Rad2Deg;
+            transform.rotation = Quaternion.Euler(0, y, 0);
+
+            this.Move(new Vector3(),false,true);
+        }
+        //人に変身した時に呼ばれる
+        private void OnEnable()
+        {
+            m_IsTransformed = true;
+        }
+    }
 }

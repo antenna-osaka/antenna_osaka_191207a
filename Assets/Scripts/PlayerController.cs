@@ -71,8 +71,8 @@ public class PlayerController : MonoBehaviour
 			rigidbody.velocity = this.m_Velocity;
 			rigidbody.angularVelocity=this.m_AngularVelocity;
 			activeGameObject.transform.SetPositionAndRotation(this.transform.position, this.transform.rotation);
+			Debug.Log(rigidbody.velocity);
 		}
-
 	}
 	GameObject getActiveGameObject()
 	{
