@@ -3,6 +3,11 @@
 
 モブプロ会と言いつつ参加者が自分一人になったのでぶつぶつ言いながら作る会になりました。
 
+以下のアセットを使いました。
+
+- Standard Assets
+- Low Poly Road Pack
+
 ## 当日の様子
 当日の配信
 https://youtu.be/NYeLvPzBD4I
